@@ -1,16 +1,69 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum ResponsibleType {
+  INDIVIDUAL
+  ORGANIZATION
+}
+
+enum PetSize {
+  SMALL
+  MEDIUM
+  LARGE
+}
+
+enum PetType {
+  PET
+  REPTILE
+  RODENT
+  BIRD
+  FISH
+  WILD_ANIMAL
+}
+
+model Responsible {
+  id           String          @id @default(uuid())
+  email        String          @unique
+  name         String
+  password     String
+  cpf          String
+  cnpj         String?
+  created_at   DateTime        @default(now())
+  updated_at   DateTime        @updatedAt
+  type         ResponsibleType
+  phone_number String?
+  address      String?
+  postal_code  String?
+  is_verified  Boolean         @default(false)
+  picture_url  String?
+  pets         Pet[]
+
+  @@map("responsible")
+}
+
+model Pet {
+  id                  String      @id @default(uuid())
+  pet_type            PetType
+  name                String
+  age                 String?
+  gender              String
+  size                PetSize
+  description_history String?
+  breed               String?
+  color               String
+  status              String
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  responsible_id      String
+  vaccination_history String?
+  pictures_url        String[]
+  responsible         Responsible @relation(fields: [responsible_id], references: [id])
+
+  @@map("pet")
 }
