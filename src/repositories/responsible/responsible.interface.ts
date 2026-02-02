@@ -19,6 +19,13 @@ export default interface ResponsibleRepository {
   }: CreateResponsibleInput): Promise<ResponsibleOutput>;
   findById(id: string): Promise<ResponsibleOutput | null>;
   findByEmail(email: string): Promise<ResponsibleOutput | null>;
+  findByEmailWithPassword(email: string): Promise<
+    | (ResponsibleOutput & {
+        id: string;
+        password: string;
+      })
+    | null
+  >;
   update({
     id,
     email,

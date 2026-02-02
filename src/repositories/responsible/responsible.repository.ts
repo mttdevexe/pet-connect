@@ -37,13 +37,36 @@ export default class ResponsibleRepository implements ResponsibleInterface {
 
     return responsible;
   }
-  findById(id: string): Promise<ResponsibleOutput> {
-    throw new Error("Method not implemented.");
+  async findById(id: string): Promise<ResponsibleOutput | null> {
+    const responsible = await prisma.responsible.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    return responsible;
   }
-  findByEmail(email: string): Promise<ResponsibleOutput> {
-    throw new Error("Method not implemented.");
+  async findByEmail(email: string): Promise<ResponsibleOutput | null> {
+    const responsible = await prisma.responsible.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    return responsible;
   }
-  update({
+  async findByEmailWithPassword(
+    email: string,
+  ): Promise<(ResponsibleOutput & { id: string; password: string }) | null> {
+    const responsible = await prisma.responsible.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    return responsible;
+  }
+  async update({
     id,
     email,
     phone_number,
@@ -60,9 +83,39 @@ export default class ResponsibleRepository implements ResponsibleInterface {
     is_verified?: boolean;
     picture_url?: string;
   }): Promise<ResponsibleOutput> {
-    throw new Error("Method not implemented.");
+    const hasAnyFieldToUpdate =
+      email !== undefined ||
+      phone_number !== undefined ||
+      address !== undefined ||
+      postal_code !== undefined ||
+      is_verified !== undefined ||
+      picture_url !== undefined;
+
+    if (!hasAnyFieldToUpdate) {
+      throw new Error("At least one field must be provided to update.");
+    }
+
+    const responsible = await prisma.responsible.update({
+      where: {
+        id,
+      },
+      data: {
+        email,
+        phone_number,
+        address,
+        postal_code,
+        is_verified,
+        picture_url,
+      },
+    });
+
+    return responsible;
   }
-  delete(id: string): Promise<void> {
-    throw new Error("Method not implemented.");
+  async delete(id: string): Promise<void> {
+    await prisma.responsible.delete({
+      where: {
+        id,
+      },
+    });
   }
 }
