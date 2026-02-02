@@ -3,7 +3,7 @@ import {
   ResponsibleOutput,
 } from "@/src/types/responsible.types";
 import ResponsibleInterface from "./responsible.interface";
-import prisma from "@/prisma/prisma.client";
+import { prisma } from "@/prisma/prisma.client";
 
 export default class ResponsibleRepository implements ResponsibleInterface {
   async create({

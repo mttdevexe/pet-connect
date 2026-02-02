@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 import CreateResponsibleUseCase from "@/src/modules/responsible/create-responsible.usecase";
 import ResponsibleRepository from "@/src/repositories/responsible/responsible.repository";
 import { NextRequest, NextResponse } from "next/server";
