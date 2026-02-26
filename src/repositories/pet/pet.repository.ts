@@ -2,6 +2,7 @@ import {
   CreatePetInput,
   UpdatePetInput,
   PetOutput,
+  PetWithResponsibleOutput,
 } from "@/src/types/pet.types";
 import PetRepositoryInterface from "./pet.interface";
 import { prisma } from "@/prisma/prisma.client";
@@ -41,12 +42,21 @@ export default class PetRepository implements PetRepositoryInterface {
     return pet;
   }
 
-  async findById(id: string): Promise<PetOutput | null> {
+  async findById(id: string): Promise<PetWithResponsibleOutput | null> {
     const pet = await prisma.pet.findUnique({
       where: { id },
+      include: {
+        responsible: {
+          select: {
+            name: true,
+            phone_number: true,
+            email: true,
+          },
+        },
+      },
     });
 
-    return pet;
+    return pet as PetWithResponsibleOutput | null;
   }
 
   async findAllByResponsibleId(responsibleId: string): Promise<PetOutput[]> {

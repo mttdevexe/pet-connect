@@ -14,6 +14,15 @@ const PET_TYPE_LABELS: Record<string, string> = {
   WILD_ANIMAL: "Animal Silvestre",
 };
 
+const PET_TYPE_EMOJI: Record<string, string> = {
+  PET: "🐶",
+  REPTILE: "🦎",
+  RODENT: "🐹",
+  BIRD: "🐦",
+  FISH: "🐠",
+  WILD_ANIMAL: "🦁",
+};
+
 const PET_SIZE_LABELS: Record<string, string> = {
   SMALL: "Pequeno",
   MEDIUM: "Medio",
@@ -83,10 +92,10 @@ export default function PetsPage() {
     <div className={styles.container}>
       <div className={styles.wrapper}>
         <div className={styles.header}>
-          <div className={styles.logoContainer}>
+          <Link href="/" className={styles.logoContainer}>
             <span className={styles.logoIcon}>🐾</span>
             <h1 className={styles.logoTitle}>Pet Connect</h1>
-          </div>
+          </Link>
           <p className={styles.subtitle}>Gerencie seus pets</p>
         </div>
 
@@ -116,70 +125,81 @@ export default function PetsPage() {
           <div className={styles.petGrid}>
             {pets.map((pet) => (
               <div key={pet.id} className={styles.petCard}>
-                <div className={styles.petCardHeader}>
-                  <span className={styles.petName}>{pet.name}</span>
-                  <span
-                    className={`${styles.petStatus} ${getStatusClass(pet.status)}`}
-                  >
-                    {STATUS_LABELS[pet.status] || pet.status}
-                  </span>
-                </div>
-                <div className={styles.petInfo}>
-                  <div className={styles.petInfoRow}>
-                    <span className={styles.petInfoLabel}>Tipo</span>
-                    <span className={styles.petInfoValue}>
-                      {PET_TYPE_LABELS[pet.pet_type] || pet.pet_type}
-                    </span>
-                  </div>
-                  <div className={styles.petInfoRow}>
-                    <span className={styles.petInfoLabel}>Porte</span>
-                    <span className={styles.petInfoValue}>
-                      {PET_SIZE_LABELS[pet.size] || pet.size}
-                    </span>
-                  </div>
-                  <div className={styles.petInfoRow}>
-                    <span className={styles.petInfoLabel}>Genero</span>
-                    <span className={styles.petInfoValue}>{pet.gender}</span>
-                  </div>
-                  <div className={styles.petInfoRow}>
-                    <span className={styles.petInfoLabel}>Cor</span>
-                    <span className={styles.petInfoValue}>{pet.color}</span>
-                  </div>
-                  {pet.breed && (
-                    <div className={styles.petInfoRow}>
-                      <span className={styles.petInfoLabel}>Raca</span>
-                      <span className={styles.petInfoValue}>{pet.breed}</span>
-                    </div>
-                  )}
-                  {pet.age && (
-                    <div className={styles.petInfoRow}>
-                      <span className={styles.petInfoLabel}>Idade</span>
-                      <span className={styles.petInfoValue}>{pet.age}</span>
+                <div className={styles.petCardImageContainer}>
+                  {pet.pictures_url && pet.pictures_url.length > 0 ? (
+                    <img
+                      src={pet.pictures_url[0]}
+                      alt={pet.name}
+                      className={styles.petCardImage}
+                    />
+                  ) : (
+                    <div className={styles.petCardImagePlaceholder}>
+                      {PET_TYPE_EMOJI[pet.pet_type] || "🐾"}
                     </div>
                   )}
                 </div>
-                <div className={styles.petActions}>
-                  <Link
-                    href={`/pets/${pet.id}/edit`}
-                    className={styles.editButton}
-                  >
-                    Editar
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(pet.id, pet.name)}
-                    className={styles.deleteButton}
-                  >
-                    Excluir
-                  </button>
+                <div className={styles.petCardBody}>
+                  <div className={styles.petCardHeader}>
+                    <span className={styles.petName}>{pet.name}</span>
+                    <span
+                      className={`${styles.petStatus} ${getStatusClass(pet.status)}`}
+                    >
+                      {STATUS_LABELS[pet.status] || pet.status}
+                    </span>
+                  </div>
+                  <div className={styles.petInfo}>
+                    <div className={styles.petInfoRow}>
+                      <span className={styles.petInfoLabel}>Tipo</span>
+                      <span className={styles.petInfoValue}>
+                        {PET_TYPE_LABELS[pet.pet_type] || pet.pet_type}
+                      </span>
+                    </div>
+                    <div className={styles.petInfoRow}>
+                      <span className={styles.petInfoLabel}>Porte</span>
+                      <span className={styles.petInfoValue}>
+                        {PET_SIZE_LABELS[pet.size] || pet.size}
+                      </span>
+                    </div>
+                    <div className={styles.petInfoRow}>
+                      <span className={styles.petInfoLabel}>Genero</span>
+                      <span className={styles.petInfoValue}>{pet.gender}</span>
+                    </div>
+                    <div className={styles.petInfoRow}>
+                      <span className={styles.petInfoLabel}>Cor</span>
+                      <span className={styles.petInfoValue}>{pet.color}</span>
+                    </div>
+                    {pet.breed && (
+                      <div className={styles.petInfoRow}>
+                        <span className={styles.petInfoLabel}>Raca</span>
+                        <span className={styles.petInfoValue}>{pet.breed}</span>
+                      </div>
+                    )}
+                    {pet.age && (
+                      <div className={styles.petInfoRow}>
+                        <span className={styles.petInfoLabel}>Idade</span>
+                        <span className={styles.petInfoValue}>{pet.age}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className={styles.petActions}>
+                    <Link
+                      href={`/pets/${pet.id}/edit`}
+                      className={styles.editButton}
+                    >
+                      Editar
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(pet.id, pet.name)}
+                      className={styles.deleteButton}
+                    >
+                      Excluir
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         )}
-
-        <Link href="/home" className={styles.backLink}>
-          Voltar para o inicio
-        </Link>
       </div>
     </div>
   );

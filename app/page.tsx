@@ -86,9 +86,6 @@ export default function HomePage() {
                 <Link href="/pets" className={styles.navLink}>
                   Meus Pets
                 </Link>
-                <Link href="/home" className={styles.navLink}>
-                  Dashboard
-                </Link>
               </>
             ) : (
               <>

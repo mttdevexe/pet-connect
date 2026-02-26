@@ -1,4 +1,5 @@
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 import CreatePetUseCase from "@/src/modules/pet/create-pet.usecase";
 import ListPetsUseCase from "@/src/modules/pet/list-pets.usecase";
@@ -7,8 +8,9 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
 function getUserIdFromToken(req: NextRequest): string | null {
-  const token = req.cookies.get("token")?.value
-    || req.headers.get("authorization")?.replace("Bearer ", "");
+  const token =
+    req.cookies.get("token")?.value ||
+    req.headers.get("authorization")?.replace("Bearer ", "");
 
   if (!token) return null;
 

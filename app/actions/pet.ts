@@ -1,4 +1,10 @@
-export type PetType = "PET" | "REPTILE" | "RODENT" | "BIRD" | "FISH" | "WILD_ANIMAL";
+export type PetType =
+  | "PET"
+  | "REPTILE"
+  | "RODENT"
+  | "BIRD"
+  | "FISH"
+  | "WILD_ANIMAL";
 export type PetSize = "SMALL" | "MEDIUM" | "LARGE";
 
 export interface CreatePetData {
@@ -29,6 +35,12 @@ export interface UpdatePetData {
   pictures_url?: string[];
 }
 
+export interface ResponsibleInfo {
+  name: string;
+  phone_number: string | null;
+  email: string;
+}
+
 export interface PetResponse {
   id: string;
   pet_type: PetType;
@@ -45,6 +57,7 @@ export interface PetResponse {
   pictures_url: string[];
   created_at: string;
   updated_at: string;
+  responsible?: ResponsibleInfo;
 }
 
 function getToken(): string {
@@ -132,7 +145,7 @@ export async function getPet(id: string): Promise<PetResponse> {
 
 export async function updatePet(
   id: string,
-  data: UpdatePetData
+  data: UpdatePetData,
 ): Promise<PetResponse> {
   const token = getToken();
 

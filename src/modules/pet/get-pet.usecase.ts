@@ -1,10 +1,10 @@
 import PetRepository from "@/src/repositories/pet/pet.repository";
-import { PetOutput } from "@/src/types/pet.types";
+import { PetWithResponsibleOutput } from "@/src/types/pet.types";
 
 export default class GetPetUseCase {
   constructor(private readonly petRepository: PetRepository) {}
 
-  async exec(id: string): Promise<PetOutput> {
+  async exec(id: string): Promise<PetWithResponsibleOutput> {
     if (!id) {
       throw new Error("Pet ID is required.");
     }

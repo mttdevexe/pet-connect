@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import styles from "./style.module.css";
@@ -39,12 +39,97 @@ export default function NewPetPage() {
     status: "available",
   });
 
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [dragActive, setDragActive] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const MAX_PHOTOS = 5;
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const processFiles = useCallback(
+    async (files: FileList | File[]) => {
+      const validFiles = Array.from(files).filter((file) => {
+        if (!file.type.startsWith("image/")) {
+          setError("Apenas arquivos de imagem sao permitidos.");
+          return false;
+        }
+        if (file.size > MAX_FILE_SIZE) {
+          setError("Cada imagem deve ter no maximo 5MB.");
+          return false;
+        }
+        return true;
+      });
+
+      const remaining = MAX_PHOTOS - photos.length;
+      if (remaining <= 0) {
+        setError(`Maximo de ${MAX_PHOTOS} fotos permitidas.`);
+        return;
+      }
+
+      const filesToProcess = validFiles.slice(0, remaining);
+      if (filesToProcess.length < validFiles.length) {
+        setError(`Maximo de ${MAX_PHOTOS} fotos. Algumas foram ignoradas.`);
+      }
+
+      const base64Promises = filesToProcess.map(fileToBase64);
+      const base64Results = await Promise.all(base64Promises);
+      setPhotos((prev) => [...prev, ...base64Results]);
+    },
+    [photos.length],
+  );
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setDragActive(false);
+      if (e.dataTransfer.files.length > 0) {
+        processFiles(e.dataTransfer.files);
+      }
+    },
+    [processFiles],
+  );
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragActive(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragActive(false);
+  }, []);
+
+  const handleFileSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files.length > 0) {
+        processFiles(e.target.files);
+        e.target.value = "";
+      }
+    },
+    [processFiles],
+  );
+
+  const removePhoto = useCallback((index: number) => {
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -68,6 +153,7 @@ export default function NewPetPage() {
         color: formData.color,
         status: formData.status,
         vaccination_history: formData.vaccination_history || undefined,
+        pictures_url: photos.length > 0 ? photos : undefined,
       });
 
       setSuccess("Pet cadastrado com sucesso!");
@@ -194,9 +280,7 @@ export default function NewPetPage() {
                   <button
                     key={size}
                     type="button"
-                    onClick={() =>
-                      setFormData((prev) => ({ ...prev, size }))
-                    }
+                    onClick={() => setFormData((prev) => ({ ...prev, size }))}
                     className={
                       formData.size === size
                         ? styles.typeButtonActive
@@ -207,6 +291,67 @@ export default function NewPetPage() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>Fotos do Pet</h3>
+              <div
+                className={
+                  dragActive ? styles.uploadAreaActive : styles.uploadArea
+                }
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleFileSelect}
+                  style={{ display: "none" }}
+                />
+                <div className={styles.uploadIcon}>📷</div>
+                <p className={styles.uploadText}>
+                  Arraste fotos aqui ou{" "}
+                  <span className={styles.uploadBrowse}>
+                    clique para selecionar
+                  </span>
+                </p>
+                <p className={styles.uploadHint}>
+                  JPG, PNG ou WebP. Maximo 5MB por foto.
+                </p>
+              </div>
+
+              {photos.length > 0 && (
+                <>
+                  <div className={styles.previewGrid}>
+                    {photos.map((photo, index) => (
+                      <div key={index} className={styles.previewItem}>
+                        <img
+                          src={photo}
+                          alt={`Foto ${index + 1}`}
+                          className={styles.previewImage}
+                        />
+                        <button
+                          type="button"
+                          className={styles.previewRemove}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removePhoto(index);
+                          }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <p className={styles.uploadCounter}>
+                    {photos.length}/{MAX_PHOTOS} fotos
+                  </p>
+                </>
+              )}
             </div>
 
             <div className={styles.section}>

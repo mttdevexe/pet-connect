@@ -24,7 +24,7 @@ export default function LoginPage() {
       const response = await login({ email, password });
       localStorage.setItem("token", response.token);
       localStorage.setItem("user", JSON.stringify(response.user));
-      router.push("/home");
+      router.push("/");
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);

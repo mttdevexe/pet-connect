@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useCallback } from "react";
 import Link from "next/link";
 import styles from "./style.module.css";
 import { getPet, type PetResponse } from "../../../actions/pet";
@@ -57,6 +57,47 @@ export default function PetDetailsPage({
   const [pet, setPet] = useState<PetResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedPhoto, setSelectedPhoto] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  const photos = pet?.pictures_url ?? [];
+  const hasPhotos = photos.length > 0;
+  const hasMultiplePhotos = photos.length > 1;
+
+  const openLightbox = useCallback((index: number) => {
+    setSelectedPhoto(index);
+    setLightboxOpen(true);
+  }, []);
+
+  const closeLightbox = useCallback(() => {
+    setLightboxOpen(false);
+  }, []);
+
+  const goToPrev = useCallback(() => {
+    setSelectedPhoto((prev) => (prev === 0 ? photos.length - 1 : prev - 1));
+  }, [photos.length]);
+
+  const goToNext = useCallback(() => {
+    setSelectedPhoto((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
+  }, [photos.length]);
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") goToPrev();
+      if (e.key === "ArrowRight") goToNext();
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [lightboxOpen, closeLightbox, goToPrev, goToNext]);
 
   useEffect(() => {
     const fetchPet = async () => {
@@ -106,18 +147,21 @@ export default function PetDetailsPage({
     <div className={styles.container}>
       <div className={styles.wrapper}>
         <div className={styles.header}>
-          <div className={styles.logoContainer}>
+          <Link href="/" className={styles.logoContainer}>
             <span className={styles.logoIcon}>🐾</span>
             <h1 className={styles.logoTitle}>Pet Connect</h1>
-          </div>
+          </Link>
           <p className={styles.subtitle}>Detalhes do pet</p>
         </div>
 
         <div className={styles.card}>
-          <div className={styles.imageContainer}>
-            {pet.pictures_url && pet.pictures_url.length > 0 ? (
+          <div
+            className={`${styles.imageContainer} ${hasPhotos ? styles.mainImageClickable : ""}`}
+            onClick={() => hasPhotos && openLightbox(selectedPhoto)}
+          >
+            {hasPhotos ? (
               <img
-                src={pet.pictures_url[0]}
+                src={photos[selectedPhoto]}
                 alt={pet.name}
                 className={styles.image}
               />
@@ -131,7 +175,37 @@ export default function PetDetailsPage({
             >
               {STATUS_LABELS[pet.status] || pet.status}
             </span>
+            {hasPhotos && (
+              <span className={styles.imageClickHint}>Clique para ampliar</span>
+            )}
+            {hasMultiplePhotos && (
+              <span className={styles.photoCounter}>
+                {selectedPhoto + 1}/{photos.length}
+              </span>
+            )}
           </div>
+
+          {hasMultiplePhotos && (
+            <div className={styles.thumbnailStrip}>
+              {photos.map((photo, index) => (
+                <div
+                  key={index}
+                  className={
+                    index === selectedPhoto
+                      ? styles.thumbnailActive
+                      : styles.thumbnail
+                  }
+                  onClick={() => setSelectedPhoto(index)}
+                >
+                  <img
+                    src={photo}
+                    alt={`Foto ${index + 1}`}
+                    className={styles.thumbnailImage}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className={styles.cardBody}>
             <h2 className={styles.petName}>{pet.name}</h2>
@@ -186,13 +260,119 @@ export default function PetDetailsPage({
                 </div>
               </div>
             )}
+
+            {pet.responsible && (
+              <div className={styles.responsibleSection}>
+                <h3 className={styles.sectionTitle}>👤 Tutor / Responsavel</h3>
+                <div className={styles.responsibleCard}>
+                  <div className={styles.responsibleRow}>
+                    <span className={styles.responsibleLabel}>Nome</span>
+                    <span className={styles.responsibleValue}>
+                      {pet.responsible.name}
+                    </span>
+                  </div>
+                  {pet.responsible.phone_number && (
+                    <div className={styles.responsibleRow}>
+                      <span className={styles.responsibleLabel}>Telefone</span>
+                      <div className={styles.responsiblePhoneLinks}>
+                        <a
+                          href={`https://wa.me/${pet.responsible.phone_number.replace(/\D/g, "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.whatsappLink}
+                        >
+                          WhatsApp
+                        </a>
+                        <a
+                          href={`tel:${pet.responsible.phone_number}`}
+                          className={styles.responsibleLink}
+                        >
+                          {pet.responsible.phone_number}
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                  <div className={styles.responsibleRow}>
+                    <span className={styles.responsibleLabel}>E-mail</span>
+                    <a
+                      href={`mailto:${pet.responsible.email}`}
+                      className={styles.responsibleLink}
+                    >
+                      {pet.responsible.email}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-
-        <Link href="/" className={styles.backLink}>
-          Voltar para a pagina inicial
-        </Link>
       </div>
+
+      {lightboxOpen && hasPhotos && (
+        <div className={styles.lightboxOverlay} onClick={closeLightbox}>
+          <button className={styles.lightboxClose} onClick={closeLightbox}>
+            ✕
+          </button>
+
+          <div
+            className={styles.lightboxContent}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {hasMultiplePhotos && (
+              <button
+                className={`${styles.lightboxNav} ${styles.lightboxPrev}`}
+                onClick={goToPrev}
+              >
+                ‹
+              </button>
+            )}
+
+            <img
+              src={photos[selectedPhoto]}
+              alt={`${pet.name} - Foto ${selectedPhoto + 1}`}
+              className={styles.lightboxImage}
+            />
+
+            {hasMultiplePhotos && (
+              <button
+                className={`${styles.lightboxNav} ${styles.lightboxNext}`}
+                onClick={goToNext}
+              >
+                ›
+              </button>
+            )}
+          </div>
+
+          {hasMultiplePhotos && (
+            <div
+              className={styles.lightboxThumbnails}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {photos.map((photo, index) => (
+                <div
+                  key={index}
+                  className={
+                    index === selectedPhoto
+                      ? styles.lightboxThumbActive
+                      : styles.lightboxThumb
+                  }
+                  onClick={() => setSelectedPhoto(index)}
+                >
+                  <img
+                    src={photo}
+                    alt={`Foto ${index + 1}`}
+                    className={styles.lightboxThumbImage}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className={styles.lightboxCounter}>
+            {selectedPhoto + 1} / {photos.length}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

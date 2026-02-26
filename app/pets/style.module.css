@@ -20,6 +20,8 @@
   justify-content: center;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .logoIcon {
@@ -93,12 +95,42 @@
   border-radius: 0.5rem;
   border: 1px solid var(--border);
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  padding: 1.25rem;
+  overflow: hidden;
   transition: box-shadow 0.2s;
 }
 
 .petCard:hover {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.petCardImageContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background-color: var(--background-secondary);
+  overflow: hidden;
+}
+
+.petCardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background-color: var(--background-secondary);
+}
+
+.petCardImagePlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  background-color: var(--background-secondary);
+}
+
+.petCardBody {
+  padding: 1.25rem;
 }
 
 .petCardHeader {

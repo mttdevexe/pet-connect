@@ -1,4 +1,10 @@
-export type PetType = "PET" | "REPTILE" | "RODENT" | "BIRD" | "FISH" | "WILD_ANIMAL";
+export type PetType =
+  | "PET"
+  | "REPTILE"
+  | "RODENT"
+  | "BIRD"
+  | "FISH"
+  | "WILD_ANIMAL";
 export type PetSize = "SMALL" | "MEDIUM" | "LARGE";
 
 export type CreatePetInput = {
@@ -47,4 +53,14 @@ export type PetOutput = {
   pictures_url: string[];
   created_at: Date;
   updated_at: Date;
+};
+
+export type ResponsibleInfo = {
+  name: string;
+  phone_number: string | null;
+  email: string;
+};
+
+export type PetWithResponsibleOutput = PetOutput & {
+  responsible: ResponsibleInfo;
 };
