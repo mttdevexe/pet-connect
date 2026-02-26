@@ -48,13 +48,43 @@ export default function NewPetPage() {
   const [loading, setLoading] = useState(false);
 
   const MAX_PHOTOS = 5;
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  const MAX_IMAGE_DIMENSION = 800;
+  const COMPRESSION_QUALITY = 0.7;
 
-  const fileToBase64 = (file: File): Promise<string> => {
+  const compressImage = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
       reader.onerror = reject;
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = reject;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let { width, height } = img;
+
+          if (width > MAX_IMAGE_DIMENSION || height > MAX_IMAGE_DIMENSION) {
+            if (width > height) {
+              height = Math.round((height * MAX_IMAGE_DIMENSION) / width);
+              width = MAX_IMAGE_DIMENSION;
+            } else {
+              width = Math.round((width * MAX_IMAGE_DIMENSION) / height);
+              height = MAX_IMAGE_DIMENSION;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            reject(new Error("Canvas not supported"));
+            return;
+          }
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/jpeg", COMPRESSION_QUALITY));
+        };
+        img.src = reader.result as string;
+      };
       reader.readAsDataURL(file);
     });
   };
@@ -84,8 +114,8 @@ export default function NewPetPage() {
         setError(`Maximo de ${MAX_PHOTOS} fotos. Algumas foram ignoradas.`);
       }
 
-      const base64Promises = filesToProcess.map(fileToBase64);
-      const base64Results = await Promise.all(base64Promises);
+      const compressPromises = filesToProcess.map(compressImage);
+      const base64Results = await Promise.all(compressPromises);
       setPhotos((prev) => [...prev, ...base64Results]);
     },
     [photos.length],
