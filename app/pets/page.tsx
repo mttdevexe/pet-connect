@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import styles from "./style.module.css";
 import { listMyPets, deletePet, type PetResponse } from "../actions/pet";
 
@@ -25,7 +26,7 @@ const PET_TYPE_EMOJI: Record<string, string> = {
 
 const PET_SIZE_LABELS: Record<string, string> = {
   SMALL: "Pequeno",
-  MEDIUM: "Medio",
+  MEDIUM: "Médio",
   LARGE: "Grande",
 };
 
@@ -49,9 +50,17 @@ function getStatusClass(status: string) {
 }
 
 export default function PetsPage() {
+  const router = useRouter();
   const [pets, setPets] = useState<PetResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const handleLogout = () => {
+    document.cookie = "token=; path=/; max-age=0";
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    router.push("/");
+  };
 
   const fetchPets = async () => {
     try {
@@ -101,9 +110,14 @@ export default function PetsPage() {
 
         <div className={styles.topBar}>
           <span className={styles.topBarTitle}>Meus Pets</span>
-          <Link href="/pets/new" className={styles.addButton}>
-            + Novo Pet
-          </Link>
+          <div className={styles.topBarActions}>
+            <Link href="/pets/new" className={styles.addButton}>
+              + Novo Pet
+            </Link>
+            <button onClick={handleLogout} className={styles.logoutButton}>
+              Sair
+            </button>
+          </div>
         </div>
 
         {error && <div className={styles.errorMessage}>{error}</div>}
@@ -170,7 +184,7 @@ export default function PetsPage() {
                     </div>
                     {pet.breed && (
                       <div className={styles.petInfoRow}>
-                        <span className={styles.petInfoLabel}>Raca</span>
+                        <span className={styles.petInfoLabel}>Raça</span>
                         <span className={styles.petInfoValue}>{pet.breed}</span>
                       </div>
                     )}

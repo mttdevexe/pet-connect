@@ -63,6 +63,14 @@ export default function HomePage() {
     fetchPets();
   }, []);
 
+  const handleLogout = () => {
+    document.cookie = "token=; path=/; max-age=0";
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setIsLoggedIn(false);
+    router.push("/");
+  };
+
   const handlePetClick = (petId: string) => {
     if (isLoggedIn) {
       router.push(`/pets/${petId}/details`);
@@ -86,6 +94,12 @@ export default function HomePage() {
                 <Link href="/pets" className={styles.navLink}>
                   Meus Pets
                 </Link>
+                <button
+                  onClick={handleLogout}
+                  className={styles.navLogoutButton}
+                >
+                  Sair
+                </button>
               </>
             ) : (
               <>
@@ -106,7 +120,7 @@ export default function HomePage() {
         <h1 className={styles.heroTitle}>Encontre seu novo melhor amigo</h1>
         <p className={styles.heroSubtitle}>
           Conectamos pets que precisam de um lar a pessoas que querem fazer a
-          diferenca. Adote com amor!
+          diferença. Adote com amor!
         </p>
       </section>
 
@@ -177,7 +191,7 @@ export default function HomePage() {
                       {pet.size === "SMALL"
                         ? "Pequeno"
                         : pet.size === "MEDIUM"
-                          ? "Medio"
+                          ? "Médio"
                           : "Grande"}
                     </span>
                   </div>
@@ -196,17 +210,17 @@ export default function HomePage() {
         >
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalIcon}>🔒</div>
-            <h2 className={styles.modalTitle}>Faca login para continuar</h2>
+            <h2 className={styles.modalTitle}>Faça login para continuar</h2>
             <p className={styles.modalDescription}>
               Para ver os detalhes deste pet e entrar em contato com o
-              responsavel, voce precisa estar logado.
+              responsável, você precisa estar logado.
             </p>
             <div className={styles.modalActions}>
               <Link href="/login" className={styles.modalLoginButton}>
                 Entrar na minha conta
               </Link>
               <p className={styles.modalRegisterText}>
-                Nao tem conta?{" "}
+                Não tem conta?{" "}
                 <Link href="/register" className={styles.modalRegisterLink}>
                   Cadastre-se gratis
                 </Link>

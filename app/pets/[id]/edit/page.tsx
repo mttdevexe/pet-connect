@@ -25,7 +25,7 @@ const PET_TYPE_LABELS: Record<PetType, string> = {
 
 const PET_SIZE_LABELS: Record<PetSize, string> = {
   SMALL: "Pequeno",
-  MEDIUM: "Medio",
+  MEDIUM: "Médio",
   LARGE: "Grande",
 };
 
@@ -259,7 +259,7 @@ export default function EditPetPage({
             <h2 className={styles.cardTitle}>Editar {pet?.name}</h2>
           </div>
           <p className={styles.cardDescription}>
-            Atualize as informacoes do pet
+            Atualize as informações do pet
           </p>
 
           <form onSubmit={handleSubmit} className={styles.form}>
@@ -311,7 +311,7 @@ export default function EditPetPage({
                 />
 
                 <InputFieldComponent
-                  label="Raca"
+                  label="Raça"
                   type="text"
                   name="breed"
                   value={formData.breed}
@@ -339,7 +339,7 @@ export default function EditPetPage({
                   >
                     <option value="">Selecione</option>
                     <option value="Macho">Macho</option>
-                    <option value="Femea">Femea</option>
+                    <option value="Femea">Fêmea</option>
                   </select>
                 </div>
               </div>
@@ -434,10 +434,10 @@ export default function EditPetPage({
             </div>
 
             <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>Informacoes Adicionais</h3>
+              <h3 className={styles.sectionTitle}>Informações Adicionais</h3>
               <div className={styles.grid}>
                 <div className={styles.fullWidth}>
-                  <label className={styles.label}>Historico / Descricao</label>
+                  <label className={styles.label}>Histórico / Descrição</label>
                   <textarea
                     name="description_history"
                     value={formData.description_history}
@@ -448,7 +448,7 @@ export default function EditPetPage({
                 </div>
 
                 <div className={styles.fullWidth}>
-                  <label className={styles.label}>Historico de Vacinacao</label>
+                  <label className={styles.label}>Histórico de Vacinação</label>
                   <textarea
                     name="vaccination_history"
                     value={formData.vaccination_history}
@@ -478,7 +478,7 @@ export default function EditPetPage({
             {success && <div className={styles.successMessage}>{success}</div>}
 
             <ButtonComponent type="submit" disabled={loading}>
-              {loading ? "Salvando..." : "Salvar Alteracoes"}
+              {loading ? "Salvando..." : "Salvar Alterações"}
             </ButtonComponent>
           </form>
 

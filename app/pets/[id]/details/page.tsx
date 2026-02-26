@@ -25,7 +25,7 @@ const PET_TYPE_EMOJI: Record<string, string> = {
 
 const PET_SIZE_LABELS: Record<string, string> = {
   SMALL: "Pequeno",
-  MEDIUM: "Medio",
+  MEDIUM: "Médio",
   LARGE: "Grande",
 };
 
@@ -133,7 +133,7 @@ export default function PetDetailsPage({
       <div className={styles.container}>
         <div className={styles.wrapper}>
           <div className={styles.errorMessage}>
-            {error || "Pet nao encontrado."}
+            {error || "Pet não encontrado."}
           </div>
           <Link href="/" className={styles.backLink}>
             Voltar para a pagina inicial
@@ -237,7 +237,7 @@ export default function PetDetailsPage({
               </div>
               {pet.breed && (
                 <div className={styles.infoItem}>
-                  <div className={styles.infoLabel}>Raca</div>
+                  <div className={styles.infoLabel}>Raça</div>
                   <div className={styles.infoValue}>{pet.breed}</div>
                 </div>
               )}
@@ -263,7 +263,7 @@ export default function PetDetailsPage({
 
             {pet.responsible && (
               <div className={styles.responsibleSection}>
-                <h3 className={styles.sectionTitle}>👤 Tutor / Responsavel</h3>
+                <h3 className={styles.sectionTitle}>👤 Tutor / Responsável</h3>
                 <div className={styles.responsibleCard}>
                   <div className={styles.responsibleRow}>
                     <span className={styles.responsibleLabel}>Nome</span>
